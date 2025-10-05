@@ -27,4 +27,15 @@ public class EncryptionUtil {
             throw new RuntimeException("Error decrypting data", e);
         }
     }
+
+    public String decrypt(String encryptedData) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
+            return new String(decrypted);
+        } catch(Exception e) {
+            throw new RuntimeException("Error decrypting data", e);
+        }
+    }
 }
