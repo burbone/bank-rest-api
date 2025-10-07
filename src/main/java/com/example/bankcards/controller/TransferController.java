@@ -5,6 +5,9 @@ import com.example.bankcards.dto.TransferRequest;
 import com.example.bankcards.entity.Transaction;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.TransferService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +20,15 @@ import java.util.List;
 @RequestMapping("/api/transfers")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+@Tag(name = "Transfers", description = "Money transfer operations between own cards")
+@SecurityRequirement(name = "Bearer Authentication")
 public class TransferController {
 
     private final TransferService transferService;
     private final CardService cardService;
 
     @PostMapping
+    @Operation(summary = "Transfer money", description = "Transfers money between user's own cards")
     public ResponseEntity<TransactionDto> transfer(@Valid @RequestBody TransferRequest request) {
         Transaction transaction = transferService.transferBetweenMyCards(
                 request.getFromCardId(),
@@ -33,6 +39,7 @@ public class TransferController {
     }
 
     @GetMapping("/my")
+    @Operation(summary = "Get my transactions", description = "Returns all transactions related to user's cards")
     public ResponseEntity<List<TransactionDto>> getMyTransactions() {
         List<TransactionDto> transactions = transferService.getMyTransactions()
                 .stream()
@@ -42,6 +49,7 @@ public class TransferController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get transaction by ID", description = "Returns transaction details")
     public ResponseEntity<TransactionDto> getTransaction(@PathVariable Long id) {
         Transaction transaction = transferService.getTransactionById(id);
         return ResponseEntity.ok(convertToDto(transaction));
